@@ -1,0 +1,60 @@
+@font-face{
+	font-family: Open Sans;
+	src: url(fonts/OpenSans-Regular.ttf);
+}
+
+body {
+	font-family: 'Open Sans', sans-serif !important;
+}
+.alert-info{
+	font-family: 'Open Sans', sans-serif !important;
+}
+
+.pendiente{
+	color: white !important;
+	background: red;
+	padding: 5px;
+	border-radius: 4px;
+}
+.hecha{
+	color: white !important;
+	background: green;
+	padding: 5px;
+	border-radius: 4px;
+}
+.subir{
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.bajar{
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.procesando{
+	color: white !important;
+	background: orange !important;
+	padding: 5px;
+	border-radius: 4px;
+}
+.form-custom{
+	width: 50%;
+	margin: 0 auto;
+	background: #333940;
+	padding: 20px;
+	color: #FFF;
+	margin-top: 50px;
+}
+.form-custom2{
+	width: 80%;
+	margin: 0 auto;
+	background: #333940;
+	padding: 20px;
+	color: #FFF;
+	margin-top: 50px;
+	margin-bottom: 40px;
+}
+@media (min-width: 768px){
+.navbar{
+	border-radius: 0px !important;
+}
+}
