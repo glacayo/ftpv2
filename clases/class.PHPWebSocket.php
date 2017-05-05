@@ -741,7 +741,11 @@ class PHPWebSocket
 
 	function log( $message )
 	{
+<<<<<<< HEAD
 		echo date_default_timezone_set("America/Managua");
+=======
+		echo date_default_timezone_set('America/Mexico_City');
+>>>>>>> 09ac4f20846b19b0921855aeaa2fbb6b3109855b
 		
 		//echo date('Y-m-d H:i:s: ') . $message . "\n";
 	}
