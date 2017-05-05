@@ -59,10 +59,6 @@ $Server->bind('message', 'wsOnMessage');
 $Server->bind('open', 'wsOnOpen');
 $Server->bind('close', 'wsOnClose');
 
-<<<<<<< HEAD
 $Server->wsStartServer('192.168.1.62',12345);
-=======
-$Server->wsStartServer('192.168.1.3',12345);
->>>>>>> 09ac4f20846b19b0921855aeaa2fbb6b3109855b
 
 ?>
