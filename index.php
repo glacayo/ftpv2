@@ -420,7 +420,8 @@ class OneFileLoginApplication
 ?>
 <?php	include('clases/conect.php'); 
 		include('funciones/hostingName.php');
-		$peticionesQuery = $dataBase->query("SELECT * FROM ftp_peticiones");
+        include('changedStatus.php');
+		$peticionesQuery = $dataBase->query("SELECT * FROM ftp_peticiones ORDER BY timestamp DESC");
 		$db = new SQLite3('users.db');
 		$userName = $_SESSION['user_name'];
 		$queryPermisos = $db->query("SELECT user_permiso FROM users WHERE user_name = '$userName'");
@@ -446,137 +447,143 @@ class OneFileLoginApplication
 </nav>
     <div class="container">
         <div class="row">
+            
 			<div id="div" class="col-md-9">
-				<?php
-				echo "<h3><strong>Peticiones recientes</strong>  <br><span>Por favor tenga paciencia, tambien nosotros estamos trabajando en paginas web!!</span></h3>";
+                <?php
+                echo "<h3><strong>Peticiones recientes</strong>  <br><span>Por favor tenga paciencia, tambien nosotros estamos trabajando en paginas web!!</span></h3>";
 
-				echo "<div id='respuestaPeticion'></div>";
-				while ($peticionesResultados = $peticionesQuery->fetchArray(SQLITE3_ASSOC)) {
-				    echo "<div>";
-				    	echo "<div class='well'>";
-				            $url = $peticionesResultados['urlPeticion'];
-				    		echo "<strong id='name_ftp_user'>" . $peticionesResultados['usuario'] . "</strong>" . " dice: Por favor <strong id='accion_peticion' class='" . $peticionesResultados['accionPeticion'] . "'>" . $peticionesResultados['accionPeticion'] . "</strong> la pagina <strong id='neme_ftp_url' class='url'>" . $peticionesResultados['urlPeticion'] . "</strong> <br> por motivos de ". $peticionesResultados['motivoPeticion'];
-				    		echo "| Peticion enviada a las: (" . $peticionesResultados['timestamp'] . ")";
-				    		if ($peticionesResultados['estadoPeticion'] == 0){
-				    			echo " | Estado de la peticion: <strong class='pendiente'><i class='fa fa-exclamation-triangle'></i> PENDIENTE</strong>";
-				    		}elseif($peticionesResultados['estadoPeticion'] == 1){
-				    			echo " | Estado de la peticion: <strong class='hecha'><i class='fa fa-check-circle'></i> HECHA</strong>";
-				    		}elseif($peticionesResultados['estadoPeticion'] == 2) {
-				                echo " | Estado de la peticion: <strong class='procesando'><i class='fa fa-cog fa-spin fa-fw'></i> PROCESANDO</strong>";
-				            }
-				    		$urlCatch = $peticionesResultados['urlPeticion'];
-				    		hostingName($urlCatch);
-				            echo "<br> Atendido por: <strong class='bajar'>" . $peticionesResultados['gestorPeticion'] . "</strong>";
-				    		echo "<div>";
-				    			echo "NOTAS ADICIONALES: <p style='word-wrap: break-word !important;'>" . strip_tags( $peticionesResultados['mensajePeticion'] ) . "</p>";
-				    		echo "</div>";
+                echo "<div id='respuestaPeticion'></div>";
+                while ($peticionesResultados = $peticionesQuery->fetchArray(SQLITE3_ASSOC)) {
+                    echo "<div>";
+                        echo "<div class='well'>";
+                            $url = $peticionesResultados['urlPeticion'];
+                            echo "<strong id='name_ftp_user'>" . $peticionesResultados['usuario'] . "</strong>" . " dice: Por favor <strong id='accion_peticion' class='" . $peticionesResultados['accionPeticion'] . "'>" . $peticionesResultados['accionPeticion'] . "</strong> la pagina <strong id='neme_ftp_url' class='url'>" . $peticionesResultados['urlPeticion'] . "</strong> <br> por motivos de ". $peticionesResultados['motivoPeticion'];
+                            echo "| Peticion enviada a las: (" . $peticionesResultados['timestamp'] . ")";
+                            if ($peticionesResultados['estadoPeticion'] == 0){
+                                echo " | Estado de la peticion: <strong class='pendiente'><i class='fa fa-exclamation-triangle'></i> PENDIENTE</strong>";
+                            }elseif($peticionesResultados['estadoPeticion'] == 1){
+                                echo " | Estado de la peticion: <strong class='hecha'><i class='fa fa-check-circle'></i> HECHA</strong>";
+                            }elseif($peticionesResultados['estadoPeticion'] == 2) {
+                                echo " | Estado de la peticion: <strong class='procesando'><i class='fa fa-cog fa-spin fa-fw'></i> PROCESANDO</strong>";
+                            }
+                            $urlCatch = $peticionesResultados['urlPeticion'];
+                            hostingName($urlCatch);
+                            echo "<br> Atendido por: <strong class='bajar'>" . $peticionesResultados['gestorPeticion'] . "</strong>";
+                            echo "<div>";
+                                echo "NOTAS ADICIONALES: <p style='word-wrap: break-word !important;'>" . strip_tags( $peticionesResultados['mensajePeticion'] ) . "</p>";
+                            echo "</div>";
 
-					        // ROW Button Control
-					         echo "<div class='row'>";
-					            if ( $user_permiso['user_permiso'] == $user_permiso['user_permiso']) {
-					                if ( $peticionesResultados['estadoPeticion'] == 0) {
-					                    echo "<form id='CancelarPeticion' class='col-md-2' action='' method='POST'>";
-					                        echo "<input type='hidden' name='IDUpdate' value=''>";
-					                        echo "<input type='hidden' name='newStatus' value='3'>";
-					                        echo "<button type='submit' class='btn btn-sm btn-danger'><i class='fa fa-times'></i> Cancelar Peticion</button>";
-					                    echo "</form>";
-					                }
-					            }
+                            // ROW Button Control
+                             echo "<div class='row'>";
+                                if ( $_SESSION['user_name'] == $peticionesResultados['usuario'] ) {
 
-					    		if ( $user_permiso['user_permiso']=="admin" ) {
-					                if($peticionesResultados['estadoPeticion'] == 1){
-					                    // Si la peticion esta hecha no mostra nada
-					                }else{
-					                    if ( $_SESSION['user_name'] == "Geovanny" ) {
-					                        if ( $peticionesResultados['estadoPeticion'] == 2 ) {
-					                            if ( $peticionesResultados['gestorPeticion'] == "Geovanny" ) {
-					                                echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
-					                                    echo "<input type='hidden' name='IDUpdate' value=''>";
-					                                    echo "<input type='hidden' name='newStatus' value='1'>";
-					                                    echo "<input type='hidden' name='gestor_peticion' value=''>";
-					                                    echo "<button type='submit' class='btn btn-sm btn-success'><i class='fa fa-check'></i> Peticion Hecha</button>";
-					                                echo "</form>";
-					                                echo "<form id='ProcesarPeticion' class='col-md-3' action='' method='POST'>";
-					                                    echo "<input type='hidden' name='IDUpdate' value=''>";
-					                                    echo "<input type='hidden' name='newStatus' value='0'>";
-					                                    echo "<input type='hidden' name='gestor_peticion' value=''>";
-					                                    echo "<button type='submit' class='btn btn-sm btn-primary'><i class='fa fa-chain-broken'></i> Interrumpir Proceso</button>";
-					                                echo "</form>";
-					                                echo "<form id='CancelarPeticion' class='col-md-2 pull-left' action='' method='POST'>";
-					                                    echo "<input type='hidden' name='IDUpdate' value=''>";
-					                                    echo "<input type='hidden' name='newStatus' value='3'>";
-					                                    echo "<button type='submit' class='btn btn-sm btn-danger'><i class='fa fa-times'></i> Eliminar esta Peticion</button>";
-					                                echo "</form>";
-					                            }
-					                        }
-					                    }elseif ( $_SESSION['user_name'] == "Reyna") {
-					                        if ( $peticionesResultados['estadoPeticion'] == 2 ) {
-					                            if ( $peticionesResultados['gestorPeticion'] == "Reyna" ) {
-					                                echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
-					                                    echo "<input type='hidden' name='IDUpdate' value=''>";
-					                                    echo "<input type='hidden' name='newStatus' value='1'>";
-					                                    echo "<input type='hidden' name='gestor_peticion' value=''>";
-					                                    echo "<button type='submit' class='btn btn-sm btn-success'><i class='fa fa-check'></i> Peticion Hecha</button>";
-					                                echo "</form>";
-					                                echo "<form id='ProcesarPeticion' class='col-md-3' action='' method='POST'>";
-					                                    echo "<input type='hidden' name='IDUpdate' value=''>";
-					                                    echo "<input type='hidden' name='newStatus' value='0'>";
-					                                    echo "<input type='hidden' name='gestor_peticion' value=''>";
-					                                    echo "<button type='submit' class='btn btn-sm btn-primary'><i class='fa fa-chain-broken'></i> Interrumpir Proceso</button>";
-					                                echo "</form>";
-					                                echo "<form id='CancelarPeticion' class='col-md-2 pull-left' action='' method='POST'>";
-					                                    echo "<input type='hidden' name='IDUpdate' value=''>";
-					                                    echo "<input type='hidden' name='newStatus' value='3'>";
-					                                    echo "<button type='submit' class='btn btn-sm btn-danger'><i class='fa fa-times'></i> Eliminar esta Peticion</button>";
-					                                echo "</form>";
-					                            }
-					                        }
-					                    }
-					                }
-					                if ( $peticionesResultados['estadoPeticion'] == 0 ) {
-					                    echo "<div class='col-md-2'>";
-					                    echo "<input type='hidden' name='IDUpdate' id='IDUpdate".$peticionesResultados['id']."' value='".$peticionesResultados['id']."'>";
-					                    echo "<input type='hidden' name='newStatus".$peticionesResultados['id']."' value='2'>";
-					                    echo "<input type='hidden' name='gestorPeticion".$peticionesResultados['id']."' value='".$_SESSION['user_name']."'>";
-					                     echo "<button type='submit' class='btn btn-sm btn-warning' onclick='insertar".$peticionesResultados['id']."();'><i class='fa fa-eye'></i> Procesar Peticion</button>";
-					                    echo "</div>";
-					                }
-					    		}
-					            echo "</div>";
-					            ?>
-								<script type="text/javascript">
-									function insertar<?php echo $peticionesResultados["id"];?>(){
-										var id = document.getElementById('IDUpdate<?php echo $peticionesResultados["id"];?>').value;
-										var newStatus = document.getElementById('newStatus<?php echo $peticionesResultados["id"];?>').value;
-										var gestorPeticion = document.getElementById('gestorPeticion<?php echo $peticionesResultados["id"];?>').value;
-										alert(id);
-						                  $.ajax({
-						                      url: 'changedStatus.php',
-						                      type: 'POST',
-						                      data: $(this).serialize(), 
-						                            dataType: 'html'
-						                  })
-						                  .done(function(data){
-						                      var $html = $( data );
-						                      //$html.filter('#respuestaPositiva').fadeIn('slow').appendTo("#respuestaForm").fadeOut(10000);
-						                     // $html.filter('#respuestaNegativa').fadeIn('slow').appendTo("#respuestaForm").fadeOut(10000);
-						                  })
-						                  .fail(function(data){
-						                      alert('Ajax Error');
-						                  });
-									}
-								</script>
-					            <?php
-            				//END Button Control
-				    	echo "</div>";
-				    echo "</div>";
-				}
-				$dataBase->close(); 
-				unset($dataBase); 
-				?>
+                                    if ( $peticionesResultados['estadoPeticion'] == 0 ) {
+                                        echo "<form id='CancelarPeticion' class='col-md-2' action='' method='POST'>";
+                                            echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                            echo "<input type='hidden' name='newStatus' value='3'>";
+                                            echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                            echo "<button type='submit' class='btn btn-sm btn-danger'><i class='fa fa-times'></i> Cancelar Peticion</button>";
+                                        echo "</form>";
+                                    }
+                                }
+
+                                if ( $user_permiso['user_permiso']=="admin" ) {
+                                    if($peticionesResultados['estadoPeticion'] == 1){
+                                        // Si la peticion esta hecha no mostra nada
+                                    }else{
+                                        if ( $_SESSION['user_name'] == "Geovanny" ) {
+                                            if ( $peticionesResultados['estadoPeticion'] == 2 ) {
+                                                if ( $peticionesResultados['gestorPeticion'] == "Geovanny" ) {
+                                                    echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' value='1'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                        echo "<button type='submit' class='btn btn-sm btn-success'><i class='fa fa-check'></i> Peticion Hecha</button>";
+                                                    echo "</form>";
+                                                    echo "<form id='ProcesarPeticion' class='col-md-3' action='' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' value='0'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                        echo "<button type='submit' class='btn btn-sm btn-primary'><i class='fa fa-chain-broken'></i> Interrumpir Proceso</button>";
+                                                    echo "</form>";
+                                                    echo "<form id='CancelarPeticion' class='col-md-2 pull-left' action='' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' value='3'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                        echo "<button type='submit' class='btn btn-sm btn-danger'><i class='fa fa-times'></i> Eliminar esta Peticion</button>";
+                                                    echo "</form>";
+                                                }
+                                            }
+                                        }elseif ( $_SESSION['user_name'] == "asyi") {
+                                            if ( $peticionesResultados['estadoPeticion'] == 2 ) {
+                                                if ( $peticionesResultados['gestorPeticion'] == "asyi" ) {
+                                                    echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' value='1'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                        echo "<button type='submit' class='btn btn-sm btn-success'><i class='fa fa-check'></i> Peticion Hecha</button>";
+                                                    echo "</form>";
+                                                    echo "<form id='ProcesarPeticion' class='col-md-3' action='' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' value='0'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                        echo "<button type='submit' class='btn btn-sm btn-primary'><i class='fa fa-chain-broken'></i> Interrumpir Proceso</button>";
+                                                    echo "</form>";
+                                                    echo "<form id='CancelarPeticion' class='col-md-2 pull-left' action='' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' value='3'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                        echo "<button type='submit' class='btn btn-sm btn-danger'><i class='fa fa-times'></i> Eliminar esta Peticion</button>";
+                                                    echo "</form>";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if ( $peticionesResultados['estadoPeticion'] == 0 ) {
+                                        echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
+                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                        echo "<input type='hidden' name='newStatus' value='2'>";
+                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                         echo "<button type='submit' class='btn btn-sm btn-warning'><i class='fa fa-eye'></i> Procesar Peticion</button>";
+                                        echo "</form>";
+                                    }
+                                }
+                                echo "</div>";
+                                ?>
+                                <script type="text/javascript">
+                                    $('#procesar<?php echo $peticionesResultados["id"];?>').click(function(){
+                                        var id = document.getElementById('IDUpdate<?php echo $peticionesResultados["id"];?>').value;
+                                        var newStatus = document.getElementById('newStatus<?php echo $peticionesResultados["id"];?>').value;
+                                        var gestorPeticion = document.getElementById('gestorPeticion<?php echo $peticionesResultados["id"];?>').value;
+                                        alert(id);
+                                          $.ajax({
+                                              url: 'changedStatus.php',
+                                              type: 'POST',
+                                              data: "IDUpdate="+id+"&urlPeticion="+newStatus+"&gestorPeticion="+gestorPeticion,
+                                                    dataType: 'html'
+                                          })
+                                          .done(function(data){
+                                              var $html = $( data );
+                                              //$html.filter('#respuestaPositiva').fadeIn('slow').appendTo("#respuestaForm").fadeOut(10000);
+                                             // $html.filter('#respuestaNegativa').fadeIn('slow').appendTo("#respuestaForm").fadeOut(10000);
+                                          })
+                                          .fail(function(data){
+                                              alert('Ajax Error');
+                                          });
+                                    })
+                                </script>
+                                <?php
+                            //END Button Control
+                        echo "</div>";
+                    echo "</div>";
+                }
+                $dataBase->close(); 
+                unset($dataBase); 
+                ?>
 			</div>
             <div class="form-send col-md-3">
 	          <div class="fija">
+                <div><a href="" id="recargar"><i class="fa fa-refresh fa-spin fa-fw"></i> Recargar</a> <span id="timer"></span></div>
                 <h3 style="">Crear Peticion </h3>
                 <form id="EnviarPeticion" action="insertar.php" method="POST" class="well">
     	            <div class="form-group">
@@ -605,7 +612,10 @@ class OneFileLoginApplication
 
 
 <script type="text/javascript">
+
 $( document ).ready(function(){
+
+
 	$('#EnviarPeticion').on('submit', function (e) {
 		e.preventDefault();
 			var usuario			= document.getElementById('usuario').value;
@@ -629,10 +639,23 @@ $( document ).ready(function(){
 					console.log('Ajax Error');
 				});//END FAIL
 	});// END GUARDAR
-	var $scores = $("#div");
-	setInterval(function () {
-	    $scores.load("index.php");
-	}, 30000);
+        var count=90;
+        var counter=setInterval(timer, 1000); //1000 will  run it every 1 second
+        function timer()
+        {
+          count=count-1;
+          if (count <= 0)
+          {
+            location.reload();
+             clearInterval(counter);
+             return;
+          }
+
+         document.getElementById("timer").innerHTML=count + " Seg"; // watch for spelling
+        }
+        $('#recargar').click(function(){
+            location.reload();
+        })
 });
 
 </script>
