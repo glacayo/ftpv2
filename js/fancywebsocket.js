@@ -46,7 +46,7 @@ var FancyWebSocket = function(url)
 			{
 				//PONER AKI LAS NOTIFICACIONES EN TIEMPO REAL
 				var JSONdata    = JSON.parse(message); //parseo la informacion
-				switch(JSONdata[0].actualizacion)//que tipo de actualizacion vamos a hacer(un nuevo mensaje, solicitud de amistad nueva, etc )
+				switch(JSONdata[0].actualizacion)//que tipo de actualizacion vamos a hacer(un nuevo mensaje, actualizacion, etc )
 				{
 					case '1':
 					actualiza_mensaje(message);
