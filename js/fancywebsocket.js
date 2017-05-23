@@ -80,11 +80,3 @@ $(document).ready(function()
     });
     Server.connect();
 });
-
-
-
-
-function actualiza_solicitud()
-{
-	alert("tipo de envio 2");
-}

@@ -13,45 +13,6 @@
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <!-- FANCYWEBSOCKET JS LOCAL -->
 <script src="js/fancywebsocket.js"></script>
-<script type="text/javascript">
-function actualiza_mensaje(message)
-{
-	var JSONdata    = JSON.parse(message); //parseo la informacion
-				var usuario = JSONdata[0].usuario
-				var urlPeticion = JSONdata[0].urlPeticion
-				var accionPeticion = JSONdata[0].accionPeticion
-				var motivoPeticion = JSONdata[0].motivoPeticion
-				var mensajePeticion = JSONdata[0].mensajePeticion
-				var estadoPeticion = JSONdata[0].estadoPeticion
-				var gestorPeticion = JSONdata[0].gestorPeticion
-				var timestamp = JSONdata[0].timestamp
-
-				var tipo = JSONdata[0].tipo;
-				var mensaje = JSONdata[0].mensaje;
-				var fecha = JSONdata[0].fecha;
-
-				if (estadoPeticion==1) {
-					estadoPeticion = "HECHA";
-				}else if (estadoPeticion==2){
-					estadoPeticion = "PROCESANDO";
-				}else if (estadoPeticion==0){
-					estadoPeticion = "PENDIENTE";
-				};
-				
-				var contenidoDiv  = $("#respuestaPeticion").html();
-				var mensajehtml   = timestamp+' : '+urlPeticion;
-		          if(window.Notification && Notification.permission !== "denied") {
-		            Notification.requestPermission(function(status) {  // si estatus es granted es por que el suario acepto 
-		              var n = new Notification('NOTIFICACION FTP', { 
-		                body: usuario+' envio una peticion para '+accionPeticion+' el sitio de '+urlPeticion,
-		                icon: 'http://192.168.1.62/ftp/alert-icon.png'
-		              }); 
-		            });
-		          }
-				$("#respuestaPeticion").html('<div><div class="well"><strong id="name_ftp_user">'+usuario+'</strong> dice: Por favor <strong id="accion_peticion" class="bajar">'+accionPeticion+'</strong> la pagina <strong id="neme_ftp_url" class="url">'+urlPeticion+'</strong> <br> por motivos de '+motivoPeticion+' | Peticion enviada a las: '+timestamp+' | Estado de la peticion: <strong class="pendiente"><i class="fa fa-exclamation-triangle"></i> '+estadoPeticion+' </strong><br> Atendido por: <strong class="bajar">'+gestorPeticion+'</strong><div>NOTAS ADICIONALES: <p style="word-wrap: break-word !important;">'+mensajePeticion+'</p></div></div>');
-}
-
-</script>
 <!-- CUSTOM CLASS AND ID'S -->
 <link rel="stylesheet" type="text/css" href="css/custom.css">
 </head>
@@ -59,7 +20,6 @@ function actualiza_mensaje(message)
 <body>
 <!-- EMPIEZA LA APLICACION -->
 <?php
-
 /**
  * Class OneFileLoginApplication
  *
@@ -416,7 +376,6 @@ class OneFileLoginApplication
         if ($this->feedback) {
             echo $this->feedback . "<br/><br/>";
     }
-    
 ?>
 <?php	include('clases/conect.php'); 
 		include('funciones/hostingName.php');
@@ -426,8 +385,81 @@ class OneFileLoginApplication
 		$userName = $_SESSION['user_name'];
 		$queryPermisos = $db->query("SELECT user_permiso FROM users WHERE user_name = '$userName'");
 		$user_permiso = $queryPermisos->fetchArray();
-		
 ?>
+<script type="text/javascript">
+function actualiza_mensaje(message)
+{
+    var JSONdata    = JSON.parse(message); //parseo la informacion
+                var usuario = JSONdata[0].usuario
+                var urlPeticion = JSONdata[0].urlPeticion
+                var accionPeticion = JSONdata[0].accionPeticion
+                var motivoPeticion = JSONdata[0].motivoPeticion
+                var mensajePeticion = JSONdata[0].mensajePeticion
+                var estadoPeticion = JSONdata[0].estadoPeticion
+                var gestorPeticion = JSONdata[0].gestorPeticion
+                var timestamp = JSONdata[0].timestamp
+
+                var tipo = JSONdata[0].tipo;
+                var mensaje = JSONdata[0].mensaje;
+                var fecha = JSONdata[0].fecha;
+
+                if (estadoPeticion==1) {
+                    estadoPeticion = "HECHA";
+                }else if (estadoPeticion==2){
+                    estadoPeticion = "PROCESANDO";
+                }else if (estadoPeticion==0){
+                    estadoPeticion = "PENDIENTE";
+                };
+                if (accionPeticion=="bajar") {
+                    var iconoAccion = "http://192.168.1.62/ftpv2/download.png";
+                }else if(accionPeticion=="subir" ){
+                    var iconoAccion = "http://192.168.1.62/ftpv2/upload.png";
+                };              
+                var contenidoDiv  = $("#respuestaPeticion").html();
+                var mensajehtml   = timestamp+' : '+urlPeticion;
+                if ("<?php echo $userName;?>"=="Geovanny" || "<?php echo $userName;?>"=="asyi") {
+                  if(window.Notification && Notification.permission !== "denied") {
+                    Notification.requestPermission(function(status) {  // si estatus es granted es por que el suario acepto 
+                      var n = new Notification('NOTIFICACION FTP', { 
+                        body: usuario+' envio una peticion para '+accionPeticion+' el sitio de '+urlPeticion,
+                        icon: iconoAccion
+                      }); 
+                    });
+                  }
+                }
+                $("#respuestaPeticion").html('<div><div class="well"><strong id="name_ftp_user">'+usuario+'</strong> dice: Por favor <strong id="accion_peticion" class="bajar">'+accionPeticion+'</strong> la pagina <strong id="neme_ftp_url" class="url">'+urlPeticion+'</strong> <br> por motivos de '+motivoPeticion+' | Peticion enviada a las: '+timestamp+' | Estado de la peticion: <strong class="pendiente"><i class="fa fa-exclamation-triangle"></i> '+estadoPeticion+' </strong><br> Atendido por: <strong class="bajar">'+gestorPeticion+'</strong><div>NOTAS ADICIONALES: <p style="word-wrap: break-word !important;">'+mensajePeticion+'</p></div></div>');
+
+}
+</script>
+<script type="text/javascript">
+    
+function actualiza_solicitud(message)
+{
+    var JSONdata    = JSON.parse(message); //parseo la informacion
+                var nuevoEstado = JSONdata[0].nuevoEstado
+                var IDUpdate = JSONdata[0].IDUpdate
+                var gestorPeticion = JSONdata[0].gestorPeticion
+                var SolicitantePeticion = JSONdata[0].SolicitantePeticion
+                var urlPeticion = JSONdata[0].urlPeticion
+                var AccionPeticion = JSONdata[0].AccionPeticion
+                var contenidoDiv  = $("#respuestaPeticion").html();
+                if (SolicitantePeticion=="<?php echo $userName;?>") {
+                      if(window.Notification && Notification.permission !== "denied") {
+                        Notification.requestPermission(function(status) {  // si estatus es granted es por que el suario acepto 
+                          var n = new Notification('NOTIFICACION FTP', { 
+                            body: 'Heey '+SolicitantePeticion+'!, '+gestorPeticion+' termino de '+AccionPeticion+' la pagina de '+urlPeticion,
+                            icon: "http://192.168.1.62/ftpv2/alert-icon.png"
+                          }); 
+                        });
+                      };
+                };
+                console.log(IDUpdate);
+                $('#'+IDUpdate).removeClass( "procesando" ).addClass( "hecha" );
+                $('#'+IDUpdate).html('<i class="fa fa-check-circle"></i> HECHA</strong>');
+                $( "#Forms"+IDUpdate ).remove();
+
+}
+</script>
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -457,14 +489,14 @@ class OneFileLoginApplication
                     echo "<div>";
                         echo "<div class='well'>";
                             $url = $peticionesResultados['urlPeticion'];
-                            echo "<strong id='name_ftp_user'>" . $peticionesResultados['usuario'] . "</strong>" . " dice: Por favor <strong id='accion_peticion' class='" . $peticionesResultados['accionPeticion'] . "'>" . $peticionesResultados['accionPeticion'] . "</strong> la pagina <strong id='neme_ftp_url' class='url'>" . $peticionesResultados['urlPeticion'] . "</strong> <br> por motivos de ". $peticionesResultados['motivoPeticion'];
+                            echo "<strong id='name_ftp_user'>" . $peticionesResultados['usuario'] . "</strong>" . " dice: Por favor <strong id='accion_peticion' class='" . $peticionesResultados['accionPeticion'] . "'>" . $peticionesResultados['accionPeticion'] . "</strong> la pagina <strong id='neme_ftp_url' class='url'>" . $peticionesResultados['urlPeticion'] . "</strong><br> por motivos de ". $peticionesResultados['motivoPeticion'];
                             echo "| Peticion enviada a las: (" . $peticionesResultados['timestamp'] . ")";
                             if ($peticionesResultados['estadoPeticion'] == 0){
                                 echo " | Estado de la peticion: <strong class='pendiente'><i class='fa fa-exclamation-triangle'></i> PENDIENTE</strong>";
                             }elseif($peticionesResultados['estadoPeticion'] == 1){
                                 echo " | Estado de la peticion: <strong class='hecha'><i class='fa fa-check-circle'></i> HECHA</strong>";
                             }elseif($peticionesResultados['estadoPeticion'] == 2) {
-                                echo " | Estado de la peticion: <strong class='procesando'><i class='fa fa-cog fa-spin fa-fw'></i> PROCESANDO</strong>";
+                                echo " | Estado de la peticion: <strong class='procesando' id='".$peticionesResultados['id']."'><i class='fa fa-cog fa-spin fa-fw'></i> PROCESANDO</strong>";
                             }
                             $urlCatch = $peticionesResultados['urlPeticion'];
                             hostingName($urlCatch);
@@ -474,7 +506,7 @@ class OneFileLoginApplication
                             echo "</div>";
 
                             // ROW Button Control
-                             echo "<div class='row'>";
+                             echo "<div class='row' id='Forms".$peticionesResultados['id']."'>";
                                 if ( $_SESSION['user_name'] == $peticionesResultados['usuario'] ) {
 
                                     if ( $peticionesResultados['estadoPeticion'] == 0 ) {
@@ -494,10 +526,10 @@ class OneFileLoginApplication
                                         if ( $_SESSION['user_name'] == "Geovanny" ) {
                                             if ( $peticionesResultados['estadoPeticion'] == 2 ) {
                                                 if ( $peticionesResultados['gestorPeticion'] == "Geovanny" ) {
-                                                    echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
-                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
-                                                        echo "<input type='hidden' name='newStatus' value='1'>";
-                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                    echo "<form id='PeticionHechaGeo' class='col-md-2' action='changedStatus2.php' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' id='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' id='newStatus' value='1'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' id='gestorPeticion' value='".$_SESSION['user_name']."'>";
                                                         echo "<button type='submit' class='btn btn-sm btn-success'><i class='fa fa-check'></i> Peticion Hecha</button>";
                                                     echo "</form>";
                                                     echo "<form id='ProcesarPeticion' class='col-md-3' action='' method='POST'>";
@@ -517,10 +549,10 @@ class OneFileLoginApplication
                                         }elseif ( $_SESSION['user_name'] == "asyi") {
                                             if ( $peticionesResultados['estadoPeticion'] == 2 ) {
                                                 if ( $peticionesResultados['gestorPeticion'] == "asyi" ) {
-                                                    echo "<form id='PeticionHecha' class='col-md-2' action='' method='POST'>";
-                                                        echo "<input type='hidden' name='IDUpdate' value='".$peticionesResultados['id']."'>";
-                                                        echo "<input type='hidden' name='newStatus' value='1'>";
-                                                        echo "<input type='hidden' name='gestorPeticion' value='".$_SESSION['user_name']."'>";
+                                                    echo "<form id='PeticionHechaGeo' class='col-md-2' action='changedStatus2.php' method='POST'>";
+                                                        echo "<input type='hidden' name='IDUpdate' id='IDUpdate' value='".$peticionesResultados['id']."'>";
+                                                        echo "<input type='hidden' name='newStatus' id='newStatus' value='1'>";
+                                                        echo "<input type='hidden' name='gestorPeticion' id='gestorPeticion' value='".$_SESSION['user_name']."'>";
                                                         echo "<button type='submit' class='btn btn-sm btn-success'><i class='fa fa-check'></i> Peticion Hecha</button>";
                                                     echo "</form>";
                                                     echo "<form id='ProcesarPeticion' class='col-md-3' action='' method='POST'>";
@@ -639,6 +671,30 @@ $( document ).ready(function(){
 					console.log('Ajax Error');
 				});//END FAIL
 	});// END GUARDAR
+
+    $('#PeticionHechaGeo').on('submit', function (e) {
+        e.preventDefault();
+            var IDUpdate         = document.getElementById('IDUpdate').value;
+            var newStatus     = document.getElementById('newStatus').value;
+            var gestorPeticion  = document.getElementById('gestorPeticion').value;
+            $.ajax({
+                    type: 'POST',
+                    url: 'changedStatus2.php',
+                    data: "IDUpdate="+IDUpdate+"&newStatus="+newStatus+"&gestorPeticion="+gestorPeticion,
+                    dataType: 'html',
+                    success: function(data) 
+                    {
+                        send(data);
+                        //$html.filter('#respuestaPositiva').fadeIn('slow').appendTo("#respuestaForm").fadeOut(10000);
+                        //$html.filter('#respuestaNegativa').fadeIn('slow').appendTo("#respuestaForm").fadeOut(10000);
+                    }//END DONE
+                })//END AJAX
+                .fail(function(data){
+                    console.log('Ajax Error');
+                });//END FAIL
+    });// END GUARDAR
+
+
         var count=90;
         var counter=setInterval(timer, 1000); //1000 will  run it every 1 second
         function timer()
@@ -661,7 +717,6 @@ $( document ).ready(function(){
 </script>
 <!-- FINALIZA LA APLICACION -->
 <?php
-       
     }
 
     /**
